@@ -1,6 +1,6 @@
 // RAFAEL FLORES BLUMM
 
-public class Carta {
+public class Carta implements Comparable<Carta>{
 	private String nome, naipe;
 	private int valor;
 
@@ -33,9 +33,15 @@ public class Carta {
 	public void setValor(int valor) {
 		this.valor = valor;
 	}
-
+	
+	@Override
 	public String toString() {
 		return nome+" de "+naipe;
+	}
+	
+	@Override
+	public int compareTo(Carta o) {
+		return this.valor - o.getValor();
 	}
 	
 	public String cartaSimbolo() {
