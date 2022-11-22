@@ -152,6 +152,7 @@ public class Controle {
 			for(int i = 0; i < 5; i++)
 				j.recebeCarta(baralho.distribuiCarta(), i);
 			Arrays.sort(j.getMao());
+			j.setPontuacao(achaCombinacao(j.getMao()));
 		}
 	}
 	
@@ -173,53 +174,73 @@ public class Controle {
 		}
 	}
 	
-	public void trocaCartas(Jogador jogador) {
+	public void rodadaTrocaCartas() {
+		for(Jogador j: jogadores) {
+			if(j.isBot()) {
+				int valorAleatorio = (int)(Math.random() * 9);
+				if(valorAleatorio < 5)
+					System.out.println(j.getNome()+" manteve sua mão inicial.");
+				else
+					trocaCartasIndividual(j);
+			}else {
+				System.out.println();
+				j.setPontuacao(achaCombinacao(j.getMao()));
+				j.imprimeMao();
+				j.imprimeCombinacao();
+				
+				String op = Teclado.leString("Você gostaria de trocar alguma carta? (S/N)");
+				while(!op.equalsIgnoreCase("S") && !op.equalsIgnoreCase("N"))
+					op = Teclado.leString("Digite uma opção válida. (S/N)");
+				
+				if(op.equalsIgnoreCase("N"))
+					System.out.println("Nenhuma carta será trocada.");
+				else
+					trocaCartasIndividual(j);
+			}
+		}
+	}
+	
+	public void trocaCartasIndividual(Jogador jogador) {
 		if(jogador.isBot()) {
-			int valorAleatorio = (int)(Math.random() * 9);
-			if(valorAleatorio < 5)
-				System.out.println(jogador.getNome()+" manteve sua mão inicial.");
-			else {
-				int[] opCartas = new int[(int)(Math.random() * 5 + 1)];  // Math.random() * (max - min) + min
-				for (int i = 0; i < opCartas.length; i++) {
-					boolean existe = true;
-					while(existe) {
-						existe = false;
-						valorAleatorio = (int)(Math.random() * 5 + 1);
-				    
-					    for(int k = 0; k < i; k++) {
-					    	if(valorAleatorio == opCartas[k]) {
-					    		existe = true;
-					    		break;
-					    	}
-					    }
-					    if(!existe) {
-					    	opCartas[i] = valorAleatorio;
-					    }
-					}
+			int[] opCartas = new int[(int)(Math.random() * 5 + 1)];  // Math.random() * (max - min) + min
+			for (int i = 0; i < opCartas.length; i++) {
+				boolean existe = true;
+				int valorAleatorio;
+				while(existe) {
+					existe = false;
+					valorAleatorio = (int)(Math.random() * 5 + 1);
+			    
+				    for(int k = 0; k < i; k++) {
+				    	if(valorAleatorio == opCartas[k]) {
+				    		existe = true;
+				    		break;
+				    	}
+				    }
+				    if(!existe) {
+				    	opCartas[i] = valorAleatorio;
+				    }
 				}
-				for(int pos: opCartas) {
-					pilhaDescarte.add(jogador.getMao()[pos - 1]);
-					jogador.recebeCarta(baralho.distribuiCarta(), pos - 1);
-				}
-				Arrays.sort(jogador.getMao());
-				System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
 			}
-		}else {
-			String op = Teclado.leString("Você gostaria de trocar alguma carta? (S/N)");
-			while(!op.equalsIgnoreCase("S") && !op.equalsIgnoreCase("N"))
-				op = Teclado.leString("Digite uma opção válida. (S/N)");
+			for(int pos: opCartas) {
+				pilhaDescarte.add(jogador.getMao()[pos - 1]);
+				jogador.recebeCarta(baralho.distribuiCarta(), pos - 1);
+			}
+			System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
 			
-			if(op.equalsIgnoreCase("N"))
-				System.out.println("Nenhuma carta será trocada.");
-			else {
-				String[] opCartas = Teclado.leString("Digite o número das cartas que gostria de trocar. (1 2 3 4 5)").split(" ");
-				for(String pos: opCartas) {
-					pilhaDescarte.add(jogador.getMao()[Integer.parseInt(pos) - 1]);
-					jogador.recebeCarta(baralho.distribuiCarta(), Integer.parseInt(pos) - 1);
-				}
-				Arrays.sort(jogador.getMao());
-				System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
+		}else {
+			String[] opCartas = Teclado.leString("Digite o número das cartas que gostria de trocar. (1 2 3 4 5)").split(" ");
+			for(String pos: opCartas) {
+				pilhaDescarte.add(jogador.getMao()[Integer.parseInt(pos) - 1]);
+				jogador.recebeCarta(baralho.distribuiCarta(), Integer.parseInt(pos) - 1);
 			}
+			System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
+		}
+		
+		Arrays.sort(jogador.getMao());
+		jogador.setPontuacao(achaCombinacao(jogador.getMao()));
+		if(!jogador.isBot()) {
+			jogador.imprimeMao();
+			jogador.imprimeCombinacao();
 		}
 	}
 	
@@ -242,7 +263,7 @@ public class Controle {
 						posAtualJogador = 0;
 				}
 			
-			if(todasApostasIguais() && quantJogadoresRodada() > 1)
+			if((todasApostasIguais() && contaJogadoresRodada() > 1) || contaJogadoresRodada() == 1)
 				break;
 		}
 	}
@@ -254,72 +275,85 @@ public class Controle {
 				maiorAposta = aposta;
 		
 		System.out.println("\n******************************************************************");
-		System.out.println("\nVEZ DE "+jogadores.get(posJogador).getNome()+
+		System.out.println("\nVEZ DE "+jogadores.get(posJogador).getNome().toUpperCase()+
 							"\nPote: $"+pote+
 							"\nSuas fichas: $"+jogadores.get(posJogador).getFichas()+"\n"+
 							"\n    1. Call ($"+maiorAposta+")"+
 							"\n    2. Raise (mínimo $"+(maiorAposta + blind)+")"+
 							"\n    3. Fold (Não participa da rodada)"+
-							(posJogador == jogadores.indexOf(jogadorBB) && todasApostasIguais() ? "\n    4. Check ($0)\n" : "\n"));
-		int op = Teclado.leInt("Digite sua jogada: ");
-		while(op < 1 && op > 4)
-			if(op == 4 && posJogador != jogadores.indexOf(jogadorBB))
-				op = Teclado.leInt("Digite uma jogada válida: ");
+							(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck() ? "\n    4. Check ($0)\n" : "\n"));
 		
-		int apostaJogador;
-		if(op == 1) {              // Call
-			if(jogadores.get(posJogador).getFichas() <= maiorAposta) {
-				apostaJogador = jogadores.get(posJogador).getFichas();
+		while(true) {
+			int op = Teclado.leInt("Digite sua jogada: ");
+			while(op < 1 && op > 4)
+				if(op == 4 && posJogador != jogadores.indexOf(jogadorBB))
+					op = Teclado.leInt("Digite uma jogada válida: ");
+			
+			int apostaJogador;
+			if(op == 1) {              // Call
+				if(jogadores.get(posJogador).getFichas() <= maiorAposta) {
+					apostaJogador = jogadores.get(posJogador).getFichas();
+					pote += apostaJogador;
+					jogadores.get(posJogador).setFichas(0);
+					System.out.println(jogadores.get(posJogador).getNome()+" apostou suas últimas $"+apostaJogador+" fichas.");
+					apostaJogador = maiorAposta;
+				} else {
+					pote += maiorAposta;
+					jogadores.get(posJogador).setFichas(jogadores.get(posJogador).getFichas() - maiorAposta);
+					apostaJogador = maiorAposta;
+					System.out.println("> "+jogadores.get(posJogador).getNome()+" igualou a aposta de $"+maiorAposta+".");
+				}
+				
+			} else if(op == 2) {       // Raise
+				while(true) {
+					apostaJogador = Teclado.leInt("Digite a quantidade de fichas que gostaria de apostar: ");
+					if(apostaJogador > jogadores.get(posJogador).getFichas())
+						System.out.println("Você tem apenas $"+jogadores.get(posJogador).getFichas()+". Aposte as fichas que tem!");
+					else if(apostaJogador < maiorAposta + blind) 
+						System.out.println("O valor ínimo do aumento da aposta é de $"+(maiorAposta + blind)+".");
+					else
+						break;
+				}
+				
 				pote += apostaJogador;
-				jogadores.get(posJogador).setFichas(0);
-				System.out.println(jogadores.get(posJogador).getNome()+" apostou suas últimas $"+apostaJogador+" fichas.");
+				if(apostaJogador == jogadores.get(posJogador).getFichas())
+					System.out.println("> ALL-IN!");
+				System.out.println("> "+jogadores.get(posJogador).getNome()+" aumentou a aposta para $"+apostaJogador+"!");
+				
+			} else if(op == 3) {        // Fold
+				jogadores.get(posJogador).setJogandoRodada(false);
+				apostaJogador = 0;
+				System.out.println("> "+jogadores.get(posJogador).getNome()+" desistiu da rodada.");
+				
+			} else if(op == 4){         // Check
 				apostaJogador = maiorAposta;
+				System.out.println("> "+jogadores.get(posJogador).getNome()+" deu check, não apostando nenhuma ficha.");
 			} else {
-				pote += maiorAposta;
-				jogadores.get(posJogador).setFichas(jogadores.get(posJogador).getFichas() - maiorAposta);
-				apostaJogador = maiorAposta;
-				System.out.println("> "+jogadores.get(posJogador).getNome()+" igualou a aposta de $"+maiorAposta+".");
+				System.out.println("Digite uma jogada válida.");
+				continue;
 			}
-			
-		} else if(op == 2) {       // Raise
-			while(true) {
-				System.out.println("Você tem $"+jogadores.get(posJogador).getFichas()+" fichas.");
-				apostaJogador = Teclado.leInt("Digite a quantidade de fichas que gostaria de apostar: ");
-				if(apostaJogador > jogadores.get(posJogador).getFichas())
-					System.out.println("Você tem apenas $"+jogadores.get(posJogador).getFichas()+". Aposte as fichas que tem!");
-				else if(apostaJogador < maiorAposta + blind) 
-					System.out.println("O valor ínimo do aumento da aposta é de $"+(maiorAposta + blind)+".");
-				else
-					break;
-			}
-
-			if(apostaJogador == jogadores.get(posJogador).getFichas())
-				System.out.println("> ALL-IN!");
-			System.out.println("> "+jogadores.get(posJogador).getNome()+" aumentou a aposta para $"+apostaJogador+"!");
-			
-		} else if(op == 3) {       // Fold
-			jogadores.get(posJogador).setJogandoRodada(false);
-			apostaJogador = 0;
-			System.out.println("> "+jogadores.get(posJogador).getNome()+" desistiu da rodada.");
-			
-		} else {                   // Check
-			apostaJogador = 0;
-			System.out.println("> "+jogadores.get(posJogador).getNome()+" deu check, não apostando nenhuma ficha.");
+			apostasRodada[posJogador] = apostaJogador;
+			return (op == 2 ? true : false);
 		}
-		
-		apostasRodada[posJogador] = apostaJogador;
-		return (op == 2 ? true : false);
 	}
 	
 	public boolean todasApostasIguais() {
 		for(int i = 1; i < apostasRodada.length; i++)
-			if(jogadores.get(i).isJogandoRodada() && apostasRodada[i] != apostasRodada[i - 1])
+			if(jogadores.get(i).isJogandoRodada() && jogadores.get(i - 1).isJogandoRodada() && apostasRodada[i] != apostasRodada[i - 1])
 				return false;
-		
 		return true;
 	}
 	
-	public int quantJogadoresRodada() {
+	public boolean podeDarCheck() {
+		for(int i = 1; i < apostasRodada.length - 1; i++)
+			if(jogadores.get(i).isJogandoRodada() && jogadores.get(i - 1).isJogandoRodada()
+																			&& apostasRodada[i] != 0 && apostasRodada[i - 1] != 0
+																			&& apostasRodada[i] != apostasRodada[i - 1])
+				return false;
+		return true;
+	}
+	
+	public int contaJogadoresRodada() {
 		int totalJogadores = 0;
 		for(Jogador j: jogadores)
 			if(j.isJogandoRodada())
@@ -328,37 +362,26 @@ public class Controle {
 	}
 	
 	public int achaCombinacao(Carta[] mao) {
-		if(royalFlush(mao)) {
-			System.out.println("Você tem um ROYAL-FLUSH.");
+		if(royalFlush(mao))
 			return 10;
-		} else if(straightFlush(mao)) {
-			System.out.println("Você tem um STRAIGHT-FLUSH.");
+		else if(straightFlush(mao))
 			return 9;
-		} else if(quadra(mao)) {
-			System.out.println("Você tem uma QUADRA.");
+		else if(quadra(mao))
 			return 8;
-		} else if(fullHouse(mao)) {
-			System.out.println("Você tem um FULL-HOUSE.");
+		else if(fullHouse(mao))
 			return 7;
-		} else if(flush(mao)) {
-			System.out.println("Você tem um FLUSH.");
+		else if(flush(mao))
 			return 6;
-		} else if(straight(mao)) {
-			System.out.println("Você tem um STRAIGHT.");
+		else if(straight(mao))
 			return 5;
-		} else if(trinca(mao)) {
-			System.out.println("Você tem uma TRINCA.");
+		else if(trinca(mao))
 			return 4;
-		} else if(doisPares(mao)) {
-			System.out.println("Você tem DOIS PARES.");
+		else if(doisPares(mao))
 			return 3;
-		} else if(umPar(mao)) {
-			System.out.println("Você tem UM PAR.");
+		else if(umPar(mao))
 			return 2;
-		} else {
-			System.out.println("Você tem uma HIGH CARD: "+mao[mao.length - 1].toString()+".");
+		else
 			return 1;
-		}
 	}
 	
 	public boolean royalFlush(Carta[] mao) {
@@ -440,18 +463,76 @@ public class Controle {
 		return false;
 	}
 	
+	public void rodadaResultado() {
+		Jogador[] jogadoresRestantes = new Jogador[contaJogadoresRodada()];
+		for(Jogador j: jogadores)
+			if(j.isJogandoRodada())
+				for(int i = 0; i <  jogadoresRestantes.length; i++)
+					if(jogadoresRestantes[i] == null) {
+						jogadoresRestantes[i] = j;
+						break;
+					}
+		Arrays.sort(jogadoresRestantes);
+		
+		if(checaEmpate(jogadoresRestantes)) {
+			int maiorPontuacao = jogadoresRestantes[jogadoresRestantes.length - 1].getPontuacao();
+			Jogador[] jogadoresEmpate = new Jogador[contaJogadoresEmpate(jogadoresRestantes, maiorPontuacao)];
+			for(Jogador j: jogadoresRestantes)
+				if(j.getPontuacao() == maiorPontuacao)
+					for(int i = 0; i <  jogadoresEmpate.length; i++)
+						if(jogadoresEmpate[i] == null) {
+							jogadoresEmpate[i] = j;
+							break;
+						}
+			
+			String strEmpate = "";
+			for(int i = 0; i < jogadoresEmpate.length; i++) {
+				jogadoresEmpate[i].setFichas(jogadoresEmpate[i].getFichas() + pote / jogadoresEmpate.length);
+				
+				if(i == jogadoresEmpate.length - 1)
+					strEmpate += jogadoresEmpate[i].getNome();
+				else
+					strEmpate += jogadoresEmpate[i].getNome()+(i < jogadoresEmpate.length - 2 ? ", " : " e ");
+			}
+			
+			strEmpate += " empataram com "+jogadoresEmpate[0].nomeCombinacao()+"."
+					+ "\nCada um ganhou $"+(pote / jogadoresEmpate.length+" do total de $"+pote+" fichas!");
+			System.out.println(strEmpate);
+			
+		} else {
+			Jogador vencedor = jogadoresRestantes[jogadoresRestantes.length - 1];
+			vencedor.setFichas(vencedor.getFichas() + pote);
+			System.out.println(vencedor.getNome()+" venceu a rodada com "+vencedor.nomeCombinacao()+" e ganhou $"+pote+" fichas!");
+		}
+	}
 	
-	
-	
-	
-	
+	public boolean checaEmpate(Jogador[] jRestantes) {
+		if(jRestantes.length > 1)
+			if(jRestantes[jRestantes.length - 1].getPontuacao() == jRestantes[jRestantes.length - 2].getPontuacao())
+				return true;
+		return false;
+	}
+
+	public int contaJogadoresEmpate(Jogador[] jRestantes, int maiorPontuacao) {
+		int total = 0;
+		for(Jogador j: jRestantes)
+			if(j.getPontuacao() == maiorPontuacao)
+				total++;
+		
+		return total;
+	}
+
+	/* TODO
+	 * arrumar método rotacionaOrdemJogadores()
+	 * criar método que exclui jogadores que estão sem fichas e perderam o jogo 
+	 */
 	
 	
 	
 	
 	
 	public void rotacionaOrdemJogadores() {
-		// TODO cansado demais pra fazer isso aqui direito
+		// TODO método rotaciona a posição dos jogadores na mesa
 		ArrayList<Jogador> ordemJogadores = new ArrayList<Jogador>(); 
 		if(jogadores.indexOf(jogadorDealer) < jogadores.size() - 1)
 			jogadorDealer = jogadores.get(jogadores.indexOf(jogadorDealer) + 1);
