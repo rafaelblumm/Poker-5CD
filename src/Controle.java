@@ -1,12 +1,13 @@
 // RAFAEL FLORES BLUMM
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Controle {
 	private ArrayList<Jogador> jogadores;
 	private Baralho baralho;
 	private ArrayList<Carta> pilhaDescarte;
-	private int smallBlind, bigBlind, pote, rodada;
+	private int smallBlind, blind, pote, rodada;
 	private Jogador jogadorDealer, jogadorSB, jogadorBB;
 	private int[] apostasRodada;
 	
@@ -14,8 +15,8 @@ public class Controle {
 		this.jogadores = new ArrayList<Jogador>();
 		this.baralho = new Baralho();
 		this.pilhaDescarte = new ArrayList<Carta>();
-		this.smallBlind = 5;
-		this.bigBlind = smallBlind * 2;
+		this.smallBlind = blind / 2;
+		this.blind = 10;
 		this.pote = 0;
 		this.rodada = 0;
 	}
@@ -52,12 +53,12 @@ public class Controle {
 		this.smallBlind = smallBlind;
 	}
 
-	public int getBigBlind() {
-		return bigBlind;
+	public int getBlind() {
+		return blind;
 	}
 
 	public void setBigBlind(int bigBlind) {
-		this.bigBlind = bigBlind;
+		this.blind = bigBlind;
 	}
 
 	public int getPote() {
@@ -129,8 +130,10 @@ public class Controle {
 		rodada += 1;
 		apostasRodada = new int[jogadores.size()];
 		
-		for(int i = 0; i < jogadores.size(); i++)
+		for(int i = 0; i < jogadores.size(); i++) {
 			jogadores.get(i).setJogandoRodada(true);
+			jogadores.get(i).setPontuacao(0);
+		}
 		
 		resetBaralho();
 		System.out.println("Embaralhando...");
@@ -145,9 +148,11 @@ public class Controle {
 	}
 	
 	public void distribuiMaos() {
-		for(Jogador j: jogadores)
+		for(Jogador j: jogadores) {
 			for(int i = 0; i < 5; i++)
 				j.recebeCarta(baralho.distribuiCarta(), i);
+			Arrays.sort(j.getMao());
+		}
 	}
 	
 	public void apostasIniciais() {
@@ -159,12 +164,12 @@ public class Controle {
 			pote += smallBlind;
 		}
 		
-		if(jogadorBB.getFichas() <= bigBlind) {
+		if(jogadorBB.getFichas() <= blind) {
 			pote += jogadorBB.getFichas();
 			jogadorBB.setFichas(0);
 		} else {
-			jogadorBB.setFichas(jogadorBB.getFichas() - bigBlind);
-			pote += bigBlind;
+			jogadorBB.setFichas(jogadorBB.getFichas() - blind);
+			pote += blind;
 		}
 	}
 	
@@ -196,6 +201,7 @@ public class Controle {
 					pilhaDescarte.add(jogador.getMao()[pos - 1]);
 					jogador.recebeCarta(baralho.distribuiCarta(), pos - 1);
 				}
+				Arrays.sort(jogador.getMao());
 				System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
 			}
 		}else {
@@ -211,6 +217,7 @@ public class Controle {
 					pilhaDescarte.add(jogador.getMao()[Integer.parseInt(pos) - 1]);
 					jogador.recebeCarta(baralho.distribuiCarta(), Integer.parseInt(pos) - 1);
 				}
+				Arrays.sort(jogador.getMao());
 				System.out.println(jogador.getNome()+" trocou "+opCartas.length+" cartas.");
 			}
 		}
@@ -227,7 +234,8 @@ public class Controle {
 		while(true) {
 			for(int i = 0; i < jogadores.size(); i++) 
 				if(jogadores.get(posAtualJogador).isJogandoRodada()) {
-					apostaIndividual(posAtualJogador);
+					if(apostaIndividual(posAtualJogador))                    // se jogador aumentar aposta,
+						i = 0;                                               // a rodada de apostas ocorre novamente.
 					
 					posAtualJogador++;
 					if(posAtualJogador == jogadores.size())
@@ -239,8 +247,8 @@ public class Controle {
 		}
 	}
 	
-	public void apostaIndividual(int posJogador) {
-		int maiorAposta = bigBlind;
+	public boolean apostaIndividual(int posJogador) {
+		int maiorAposta = blind;
 		for(int aposta: apostasRodada)
 			if(aposta > maiorAposta)
 				maiorAposta = aposta;
@@ -250,7 +258,7 @@ public class Controle {
 							"\nPote: $"+pote+
 							"\nSuas fichas: $"+jogadores.get(posJogador).getFichas()+"\n"+
 							"\n    1. Call ($"+maiorAposta+")"+
-							"\n    2. Raise (mínimo $"+(maiorAposta + bigBlind)+")"+
+							"\n    2. Raise (mínimo $"+(maiorAposta + blind)+")"+
 							"\n    3. Fold (Não participa da rodada)"+
 							(posJogador == jogadores.indexOf(jogadorBB) && todasApostasIguais() ? "\n    4. Check ($0)\n" : "\n"));
 		int op = Teclado.leInt("Digite sua jogada: ");
@@ -279,8 +287,8 @@ public class Controle {
 				apostaJogador = Teclado.leInt("Digite a quantidade de fichas que gostaria de apostar: ");
 				if(apostaJogador > jogadores.get(posJogador).getFichas())
 					System.out.println("Você tem apenas $"+jogadores.get(posJogador).getFichas()+". Aposte as fichas que tem!");
-				else if(apostaJogador < maiorAposta + bigBlind) 
-					System.out.println("O valor mínimo do aumento da aposta é de $"+(maiorAposta + bigBlind)+".");
+				else if(apostaJogador < maiorAposta + blind) 
+					System.out.println("O valor ínimo do aumento da aposta é de $"+(maiorAposta + blind)+".");
 				else
 					break;
 			}
@@ -300,6 +308,7 @@ public class Controle {
 		}
 		
 		apostasRodada[posJogador] = apostaJogador;
+		return (op == 2 ? true : false);
 	}
 	
 	public boolean todasApostasIguais() {
@@ -318,6 +327,134 @@ public class Controle {
 		return totalJogadores;
 	}
 	
+	public int achaCombinacao(Carta[] mao) {
+		if(royalFlush(mao)) {
+			System.out.println("Você tem um ROYAL-FLUSH.");
+			return 10;
+		} else if(straightFlush(mao)) {
+			System.out.println("Você tem um STRAIGHT-FLUSH.");
+			return 9;
+		} else if(quadra(mao)) {
+			System.out.println("Você tem uma QUADRA.");
+			return 8;
+		} else if(fullHouse(mao)) {
+			System.out.println("Você tem um FULL-HOUSE.");
+			return 7;
+		} else if(flush(mao)) {
+			System.out.println("Você tem um FLUSH.");
+			return 6;
+		} else if(straight(mao)) {
+			System.out.println("Você tem um STRAIGHT.");
+			return 5;
+		} else if(trinca(mao)) {
+			System.out.println("Você tem uma TRINCA.");
+			return 4;
+		} else if(doisPares(mao)) {
+			System.out.println("Você tem DOIS PARES.");
+			return 3;
+		} else if(umPar(mao)) {
+			System.out.println("Você tem UM PAR.");
+			return 2;
+		} else {
+			System.out.println("Você tem uma HIGH CARD: "+mao[mao.length - 1].toString()+".");
+			return 1;
+		}
+	}
+	
+	public boolean royalFlush(Carta[] mao) {
+		if(mao[0].getValor() == 10 && flush(mao) && straight(mao))
+			return true;
+		
+		return false;
+	}
+	
+	public boolean straightFlush(Carta[] mao) {
+		if(straight(mao) && flush(mao))
+			return true;
+		
+		return false;
+	}
+	
+	public boolean quadra(Carta[] mao) {
+		for(int i = 0; i < 2; i++)
+			for(int j = i + 1; j < i + 4; j++) {
+				if(mao[i].getValor() != mao[j].getValor())
+					break;
+				if(j == i + 3)
+					return true;
+			}
+		
+		return false;
+	}
+	
+	public boolean fullHouse(Carta[] mao) {
+		Carta cartaTrinca = null;
+		Carta cartaPar = null;
+		
+		for(int i = 1; i < mao.length; i++)
+			if(mao[i].getValor() == mao[i - 1].getValor())
+				if(i + 1 < mao.length && mao[i].getValor() == mao[i + 1].getValor())
+					cartaTrinca = mao[i];
+				else
+					cartaPar = mao[i];
+		
+		if(cartaTrinca != null && cartaPar != null && cartaTrinca != cartaPar)
+			return true;
+		
+		return false;
+	}
+	
+	public boolean flush(Carta[] mao) {
+		for(int i = 1; i < mao.length; i++)
+			if(!mao[i].getNaipe().equalsIgnoreCase(mao[i - 1].getNaipe()))
+				return false;
+		
+		return true;
+	}
+	
+	public boolean straight(Carta[] mao) {
+		if(!(mao[mao.length - 1].getValor() == 14 &&
+									mao[0].getValor() == 2 &&
+									mao[1].getValor() == 3 &&
+									mao[2].getValor() == 4 &&
+									mao[3].getValor() == 5))
+			for(int i = 1; i < mao.length; i++)
+				if(mao[i].getValor() != mao[i - 1].getValor() + 1)
+					return false;
+		
+		return true;
+	}
+	
+	public boolean trinca(Carta[] mao) {
+		for(int i = 2; i < mao.length; i++)
+			if(mao[i].getValor() == mao[i - 1].getValor() && mao[i].getValor() == mao[i - 2].getValor())
+				return true;
+		
+		return false;
+	}
+	
+	public boolean doisPares(Carta[] mao) {
+		for(int i = 1; i < mao.length; i++)
+			if(mao[i].getValor() == mao[i - 1].getValor())
+				for(int j = i + 2; j < mao.length; j++)
+					if(mao[j].getValor() == mao[j - 1].getValor())
+						return true;
+		
+		return false;
+	}
+	
+	public boolean umPar(Carta[] mao) {
+		for(int i = 1; i < mao.length; i++)
+			if(mao[i].getValor() == mao[i - 1].getValor())
+				return true;
+		return false;
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -325,7 +462,7 @@ public class Controle {
 	
 	public void rotacionaOrdemJogadores() {
 		// TODO cansado demais pra fazer isso aqui direito
-		ArrayList<Jogador> ordemJogadores = new ArrayList<Jogador>(); // NÃO PRECISA FAZER OUTRO ARRAYLIST!!!!!!!!!!!!!!!
+		ArrayList<Jogador> ordemJogadores = new ArrayList<Jogador>(); 
 		if(jogadores.indexOf(jogadorDealer) < jogadores.size() - 1)
 			jogadorDealer = jogadores.get(jogadores.indexOf(jogadorDealer) + 1);
 		else
@@ -347,14 +484,3 @@ public class Controle {
 		
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
