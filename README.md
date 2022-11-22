@@ -1,14 +1,14 @@
 # Poker-5CD
 5 card draw Poker game (Java)
 
-	ETAPAS DO JOGO
+ETAPAS DO JOGO
 1. DISTRIBUIÇÃO DAS CARTAS:
 2. APOSTAS INICIAIS:
 3. TROCA DE CARTAS:
 4. APOSTAS
 5. RESULTADO
 
-	RANKING DAS COMBINAÇÕES DE POKER
+RANKING DAS COMBINAÇÕES DE POKER
 PONTOS    COMBINAÇÃO         DESCRIÇÃO
 10        Royal Flush        Straight (10-J-Q-K-A) + Flush
 9         Straight Flush     Straight (qualquer) + Flush
