@@ -11,36 +11,32 @@ public class Principal {
 		System.out.println("RODADA Nº "+ctrl.getRodada());
 		
 		
-		// DISTRIBUIÇÃO DAS CARTAS
+		// ETAPA 1: DISTRIBUIÇÃO DAS CARTAS
 		System.out.println("\nDISTRIBUIÇÃO DAS CARTAS");
 		ctrl.distribuiMaos();
 		
 		
-		// APOSTAS INICIAIS
+		// ETAPA 2: APOSTAS INICIAIS
 		System.out.println("\nAPOSTAS INICIAIS");
 		ctrl.apostasIniciais();
 		System.out.println("SMALL BLIND | "+ctrl.getJogadorSB().getNome()+": +$"+ctrl.getSmallBlind()+
-							"\nBIG BLIND   | "+ctrl.getJogadorBB().getNome()+": +$"+ctrl.getBigBlind()+
+							"\nBIG BLIND   | "+ctrl.getJogadorBB().getNome()+": +$"+ctrl.getBlind()+
 							"\n> Total de fichas no pote: $"+ctrl.getPote());
 		
 		
-		// TROCA DE CARTAS
+		// ETAPA 3: TROCA DE CARTAS
 		System.out.println("\nTROCA DE CARTAS");
-		for(int i = 0; i < ctrl.getJogadores().size(); i++) {
-			ctrl.getJogadores().get(i).imprimeMao();
-			ctrl.trocaCartas(ctrl.getJogadores().get(i));
-			ctrl.getJogadores().get(i).imprimeMao();
-			System.out.print("\n");
-		}
+		ctrl.rodadaTrocaCartas();
 		
 		
-		// APOSTAS
+		// ETAPA 4: APOSTAS
 		System.out.println("\nRODADA DE APOSTAS");
 		ctrl.rodadaApostas();
 		System.out.println("\nFIM DA RODADA DE APOSTAS");
 		
-		// RESULTADO
 		
+		// ETAPA 5: RESULTADO
+		ctrl.rodadaResultado();
 		
 	}
 }
