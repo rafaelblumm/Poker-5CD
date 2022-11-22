@@ -388,19 +388,9 @@ public class Controle {
 	}
 	
 	public boolean fullHouse(Carta[] mao) {
-		Carta cartaTrinca = null;
-		Carta cartaPar = null;
-		
-		for(int i = 1; i < mao.length; i++)
-			if(mao[i].getValor() == mao[i - 1].getValor())
-				if(i + 1 < mao.length && mao[i].getValor() == mao[i + 1].getValor())
-					cartaTrinca = mao[i];
-				else
-					cartaPar = mao[i];
-		
-		if(cartaTrinca != null && cartaPar != null && cartaTrinca != cartaPar)
-			return true;
-		
+		if(mao[0].getValor() == mao[1].getValor() && mao[3].getValor() == mao[4].getValor())
+			if(mao[1].getValor() == mao[2].getValor() || mao[3].getValor() == mao[2].getValor())
+				return true;
 		return false;
 	}
 	
