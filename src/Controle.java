@@ -7,7 +7,7 @@ public class Controle {
 	private ArrayList<Jogador> jogadores;
 	private Baralho baralho;
 	private ArrayList<Carta> pilhaDescarte;
-	private int smallBlind, blind, pote, rodada;
+	private int blind, smallBlind, pote, rodada;
 	private Jogador jogadorDealer, jogadorSB, jogadorBB;
 	private int[] apostasRodada;
 	
@@ -15,8 +15,8 @@ public class Controle {
 		this.jogadores = new ArrayList<Jogador>();
 		this.baralho = new Baralho();
 		this.pilhaDescarte = new ArrayList<Carta>();
-		this.smallBlind = blind / 2;
 		this.blind = 10;
+		this.smallBlind = blind / 2;
 		this.pote = 0;
 		this.rodada = 0;
 	}
@@ -126,8 +126,8 @@ public class Controle {
 	}
 	
 	public void novaRodada() {
+		rodada++;
 		pote = 0;
-		rodada += 1;
 		apostasRodada = new int[jogadores.size()];
 		
 		for(int i = 0; i < jogadores.size(); i++) {
@@ -135,16 +135,26 @@ public class Controle {
 			jogadores.get(i).setPontuacao(0);
 		}
 		
+		System.out.println("RODADA Nº "+rodada);
 		resetBaralho();
 		System.out.println("Embaralhando...");
 		baralho.embaralha();
 	}
 	
 	public void resetBaralho() {
+		recolheMaos();
+		
 		while(!pilhaDescarte.isEmpty()) {
 			baralho.adicionaCarta(pilhaDescarte.get(0));
 			pilhaDescarte.remove(0);
 		}
+	}
+	
+	public void recolheMaos() {
+		for(Jogador j: jogadores)
+			for(Carta c: j.getMao())
+				if(c != null)
+					pilhaDescarte.add(c);
 	}
 	
 	public void distribuiMaos() {
@@ -269,15 +279,16 @@ public class Controle {
 	}
 	
 	public boolean apostaIndividual(int posJogador) {
+		Jogador atualJogador = jogadores.get(posJogador);
 		int maiorAposta = blind;
 		for(int aposta: apostasRodada)
 			if(aposta > maiorAposta)
 				maiorAposta = aposta;
 		
 		System.out.println("\n******************************************************************");
-		System.out.println("\nVEZ DE "+jogadores.get(posJogador).getNome().toUpperCase()+
+		System.out.println("\nVEZ DE "+atualJogador.getNome().toUpperCase()+
 							"\nPote: $"+pote+
-							"\nSuas fichas: $"+jogadores.get(posJogador).getFichas()+"\n"+
+							"\nSuas fichas: $"+atualJogador.getFichas()+"\n"+
 							"\n    1. Call ($"+maiorAposta+")"+
 							"\n    2. Raise (mínimo $"+(maiorAposta + blind)+")"+
 							"\n    3. Fold (Não participa da rodada)"+
@@ -291,24 +302,24 @@ public class Controle {
 			
 			int apostaJogador;
 			if(op == 1) {              // Call
-				if(jogadores.get(posJogador).getFichas() <= maiorAposta) {
-					apostaJogador = jogadores.get(posJogador).getFichas();
+				if(atualJogador.getFichas() <= maiorAposta) {
+					apostaJogador = atualJogador.getFichas();
 					pote += apostaJogador;
-					jogadores.get(posJogador).setFichas(0);
-					System.out.println(jogadores.get(posJogador).getNome()+" apostou suas últimas $"+apostaJogador+" fichas.");
+					atualJogador.setFichas(0);
+					System.out.println(atualJogador.getNome()+" apostou suas últimas $"+apostaJogador+" fichas.");
 					apostaJogador = maiorAposta;
 				} else {
 					pote += maiorAposta;
-					jogadores.get(posJogador).setFichas(jogadores.get(posJogador).getFichas() - maiorAposta);
+					atualJogador.setFichas(atualJogador.getFichas() - maiorAposta);
 					apostaJogador = maiorAposta;
-					System.out.println("> "+jogadores.get(posJogador).getNome()+" igualou a aposta de $"+maiorAposta+".");
+					System.out.println("> "+atualJogador.getNome()+" igualou a aposta de $"+maiorAposta+".");
 				}
 				
 			} else if(op == 2) {       // Raise
 				while(true) {
 					apostaJogador = Teclado.leInt("Digite a quantidade de fichas que gostaria de apostar: ");
-					if(apostaJogador > jogadores.get(posJogador).getFichas())
-						System.out.println("Você tem apenas $"+jogadores.get(posJogador).getFichas()+". Aposte as fichas que tem!");
+					if(apostaJogador > atualJogador.getFichas())
+						System.out.println("Você tem apenas $"+atualJogador.getFichas()+". Aposte as fichas que tem!");
 					else if(apostaJogador < maiorAposta + blind) 
 						System.out.println("O valor ínimo do aumento da aposta é de $"+(maiorAposta + blind)+".");
 					else
@@ -316,22 +327,24 @@ public class Controle {
 				}
 				
 				pote += apostaJogador;
-				if(apostaJogador == jogadores.get(posJogador).getFichas())
+				if(apostaJogador == atualJogador.getFichas())
 					System.out.println("> ALL-IN!");
-				System.out.println("> "+jogadores.get(posJogador).getNome()+" aumentou a aposta para $"+apostaJogador+"!");
+				atualJogador.setFichas(atualJogador.getFichas() - apostaJogador);
+				System.out.println("> "+atualJogador.getNome()+" aumentou a aposta para $"+apostaJogador+"!");
 				
 			} else if(op == 3) {        // Fold
-				jogadores.get(posJogador).setJogandoRodada(false);
+				atualJogador.setJogandoRodada(false);
 				apostaJogador = 0;
-				System.out.println("> "+jogadores.get(posJogador).getNome()+" desistiu da rodada.");
+				System.out.println("> "+atualJogador.getNome()+" desistiu da rodada.");
 				
 			} else if(op == 4){         // Check
 				apostaJogador = maiorAposta;
-				System.out.println("> "+jogadores.get(posJogador).getNome()+" deu check, não apostando nenhuma ficha.");
+				System.out.println("> "+atualJogador.getNome()+" deu check, não apostando nenhuma ficha.");
 			} else {
 				System.out.println("Digite uma jogada válida.");
 				continue;
 			}
+			
 			apostasRodada[posJogador] = apostaJogador;
 			return (op == 2 ? true : false);
 		}
@@ -485,25 +498,30 @@ public class Controle {
 							break;
 						}
 			
-			String strEmpate = "";
+			String msgEmpate = "> ";
 			for(int i = 0; i < jogadoresEmpate.length; i++) {
 				jogadoresEmpate[i].setFichas(jogadoresEmpate[i].getFichas() + pote / jogadoresEmpate.length);
 				
-				if(i == jogadoresEmpate.length - 1)
-					strEmpate += jogadoresEmpate[i].getNome();
-				else
-					strEmpate += jogadoresEmpate[i].getNome()+(i < jogadoresEmpate.length - 2 ? ", " : " e ");
+				msgEmpate += jogadoresEmpate[i].getNome();
+				if(i != jogadoresEmpate.length - 1)
+					msgEmpate += (i < jogadoresEmpate.length - 2 ? ", " : " e ");
 			}
 			
-			strEmpate += " empataram com "+jogadoresEmpate[0].nomeCombinacao()+"."
+			msgEmpate += " empataram com "+jogadoresEmpate[0].nomeCombinacao()+"."
 					+ "\nCada um ganhou $"+(pote / jogadoresEmpate.length+" do total de $"+pote+" fichas!");
-			System.out.println(strEmpate);
+			System.out.println(msgEmpate);
 			
 		} else {
 			Jogador vencedor = jogadoresRestantes[jogadoresRestantes.length - 1];
 			vencedor.setFichas(vencedor.getFichas() + pote);
 			System.out.println(vencedor.getNome()+" venceu a rodada com "+vencedor.nomeCombinacao()+" e ganhou $"+pote+" fichas!");
 		}
+		
+		if(checaPerdedores())
+			removePerdedores(encontraPerdedores(contaPerdedores()));
+		
+		if(jogadores.size() >= 2)
+			rotacionaOrdemJogadores();
 	}
 	
 	public boolean checaEmpate(Jogador[] jRestantes) {
@@ -527,31 +545,69 @@ public class Controle {
 	 * criar método que exclui jogadores que estão sem fichas e perderam o jogo 
 	 */
 	
-	
-	
-	
-	
 	public void rotacionaOrdemJogadores() {
-		// TODO método rotaciona a posição dos jogadores na mesa
-		ArrayList<Jogador> ordemJogadores = new ArrayList<Jogador>(); 
-		if(jogadores.indexOf(jogadorDealer) < jogadores.size() - 1)
-			jogadorDealer = jogadores.get(jogadores.indexOf(jogadorDealer) + 1);
-		else
-			jogadorDealer = jogadores.get(0);
+		int posDealer = jogadores.indexOf(jogadorDealer);
+		int posSB = jogadores.indexOf(jogadorSB);
+		int posBB = jogadores.indexOf(jogadorBB);
 		
-		if(jogadores.size() == 2)
-			jogadorSB = jogadorDealer;
-		else if(jogadores.indexOf(jogadorSB) < jogadores.size() - 1)
-			jogadorSB = jogadores.get(jogadores.indexOf(jogadorSB) + 1);
-		else
-			jogadorSB = jogadores.get(0);
+		if(jogadores.contains(jogadorDealer))
+			posDealer = (posDealer < jogadores.size() - 1 ? posDealer + 1 : 0);
 		
-		if(jogadores.indexOf(jogadorBB) < jogadores.size() - 1)
-			jogadorBB = jogadores.get(jogadores.indexOf(jogadorBB) + 1);
-		else
-			jogadorBB = jogadores.get(0);
+		if(jogadores.size() > 2) {
+			posSB = (posDealer < jogadores.size() - 1 ? posDealer + 1 : 0);
+			posBB = (posSB < jogadores.size() - 1 ? posSB + 1 : 0);
+		}
+		else {
+			posSB = posDealer;
+			posBB = (posSB == 0 ? 1 : 0);
+		}
 		
-		ordemJogadores.add(jogadorSB);
-		
+		jogadorDealer = jogadores.get(posDealer);
+		jogadorSB = jogadores.get(posSB);
+		jogadorBB = jogadores.get(posBB); // INDEX = 3 BUG
 	}
+	
+	public boolean checaPerdedores() {
+		for(Jogador j: jogadores)
+			if(j.getFichas() <= 0)
+				return true;
+		return false;
+	}
+	
+	public int contaPerdedores() {
+		int quantPerdedores = 0;
+		for(Jogador j: jogadores)
+			if(j.getFichas() <= 0)
+				quantPerdedores += 1;
+		
+		return quantPerdedores;
+	}
+	
+	public Jogador[] encontraPerdedores(int quantPerdedores) {
+		Jogador[] arrayPerdedores = new Jogador[quantPerdedores];
+		for(Jogador j: jogadores)
+			if(j.getFichas() <= 0)
+				for(int i = 0; i < arrayPerdedores.length; i++)
+					if(arrayPerdedores[i] == null) {
+						arrayPerdedores[i] = j;
+						break;
+					}
+		
+		return arrayPerdedores;
+	}
+	
+	public void removePerdedores(Jogador[] perdedores) {
+		String msg = "> ";
+		for(int i = 0; i < perdedores.length; i++) {
+			if(jogadores.contains(perdedores[i])) {
+				jogadores.remove(perdedores[i]);
+				
+				msg += perdedores[i].getNome();
+				if(i != perdedores.length - 1)
+					msg += (i < perdedores.length - 2 ? ", " : " e ");
+			}
+		}
+		msg += (perdedores.length > 1 ? " perderam todas suas fichas e estão fora do jogo!" : " perdeu todas suas fichas e está fora do jogo!");
+		System.out.println(msg);
+	}	
 }
