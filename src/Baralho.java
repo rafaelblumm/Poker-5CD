@@ -17,6 +17,14 @@ public class Baralho {
 			}
 	}
 	
+	public Carta[] getCartas() {
+		return cartas;
+	}
+
+	public void setCartas(Carta[] cartas) {
+		this.cartas = cartas;
+	}
+	
 	public void embaralha() {
 		int valorAleatorioA, valorAleatorioB;
 		Carta holdCarta;
