@@ -262,11 +262,14 @@ public class Controle {
 			posPrimeiroJogador = jogadores.indexOf(jogadorBB) + 1;
 		int posAtualJogador = posPrimeiroJogador;
 		
+		boolean apostaAumentou = false;;
 		while(true) {
 			for(int i = 0; i < jogadores.size(); i++) 
 				if(jogadores.get(posAtualJogador).isJogandoRodada()) {
-					if(apostaIndividual(posAtualJogador))                    // se jogador aumentar aposta,
-						i = 0;                                               // a rodada de apostas ocorre novamente.
+					if(apostaIndividual(posAtualJogador, apostaAumentou)) {        // se jogador aumentar aposta, a rodada de apostas ocorre novamente.
+						i = 0;
+						apostaAumentou = true;
+					}
 					
 					posAtualJogador++;
 					if(posAtualJogador == jogadores.size())
@@ -278,26 +281,26 @@ public class Controle {
 		}
 	}
 	
-	public boolean apostaIndividual(int posJogador) {
+	public boolean apostaIndividual(int posJogador, boolean apostaAumentou) {
 		Jogador atualJogador = jogadores.get(posJogador);
 		int maiorAposta = blind;
 		for(int aposta: apostasRodada)
 			if(aposta > maiorAposta)
 				maiorAposta = aposta;
 		
-		System.out.println("\n******************************************************************");
+		System.out.println("\n*********************************************");
 		System.out.println("\nVEZ DE "+atualJogador.getNome().toUpperCase()+
 							"\nPote: $"+pote+
 							"\nSuas fichas: $"+atualJogador.getFichas()+"\n"+
 							"\n    1. Call ($"+maiorAposta+")"+
 							"\n    2. Raise (mínimo $"+(maiorAposta + blind)+")"+
 							"\n    3. Fold (Não participa da rodada)"+
-							(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck() ? "\n    4. Check ($0)\n" : "\n"));
+							(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck(apostaAumentou) ? "\n    4. Check ($0)\n" : "\n"));
 		
 		while(true) {
 			int op = Teclado.leInt("Digite sua jogada: ");
 			while(op < 1 && op > 4)
-				if(op == 4 && posJogador != jogadores.indexOf(jogadorBB))
+				if(op == 4 && posJogador != jogadores.indexOf(jogadorBB) && !podeDarCheck(apostaAumentou))
 					op = Teclado.leInt("Digite uma jogada válida: ");
 			
 			int apostaJogador;
@@ -357,13 +360,15 @@ public class Controle {
 		return true;
 	}
 	
-	public boolean podeDarCheck() {
-		for(int i = 1; i < apostasRodada.length - 1; i++)
-			if(jogadores.get(i).isJogandoRodada() && jogadores.get(i - 1).isJogandoRodada()
-																			&& apostasRodada[i] != 0 && apostasRodada[i - 1] != 0
-																			&& apostasRodada[i] != apostasRodada[i - 1])
-				return false;
-		return true;
+	public boolean podeDarCheck(boolean apostaAumentou) {
+		if(apostaAumentou)
+			return false;
+		else {
+			for(int aposta: apostasRodada)
+				if(aposta != blind && aposta != 0)
+					return false;
+			return true;
+		}
 	}
 	
 	public int contaJogadoresRodada() {
@@ -539,11 +544,6 @@ public class Controle {
 		
 		return total;
 	}
-
-	/* TODO
-	 * arrumar método rotacionaOrdemJogadores()
-	 * criar método que exclui jogadores que estão sem fichas e perderam o jogo 
-	 */
 	
 	public void rotacionaOrdemJogadores() {
 		int posDealer = jogadores.indexOf(jogadorDealer);
