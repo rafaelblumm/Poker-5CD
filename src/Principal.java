@@ -53,7 +53,7 @@ public class Principal {
 			// ETAPA 4: APOSTAS
 			System.out.println("\nRODADA DE APOSTAS");
 			ctrl.rodadaApostas();
-			System.out.println("\nFIM DA RODADA DE APOSTAS");
+			System.out.println("\nFIM DA RODADA DE APOSTAS\n");
 			
 			
 			// ETAPA 5: RESULTADO
