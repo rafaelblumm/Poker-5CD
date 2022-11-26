@@ -145,7 +145,7 @@ public class Controle {
 			jogadores.get(i).setPontuacao(0);
 		}
 		
-		System.out.println("RODADA Nº "+rodada);
+		System.out.println("\nRODADA Nº "+rodada);
 		resetBaralho();
 		System.out.println("Embaralhando...");
 		baralho.embaralha();
@@ -177,11 +177,14 @@ public class Controle {
 	 * Método que gerencia a etapa de DISTRIBUIÇÃO DE CARTAS.
 	 */
 	public void distribuiMaos() {
-		for(Jogador j: jogadores) {
-			for(int i = 0; i < 5; i++)
+		for(int i = 0; i < 5; i++) {
+			for(Jogador j: jogadores) {
 				j.recebeCarta(baralho.distribuiCarta(), i);
-			Arrays.sort(j.getMao());
-			j.setPontuacao(achaCombinacao(j.getMao()));
+				if(i == 4) {
+					Arrays.sort(j.getMao());
+					j.setPontuacao(achaCombinacao(j.getMao()));
+				}
+			}
 		}
 	}
 	
@@ -216,7 +219,18 @@ public class Controle {
 	 * Método que gerencia a etapa de TROCA DE CARTAS.
 	 */
 	public void rodadaTrocaCartas() {
-		for(Jogador j: jogadores) {
+		int posPrimeiroJogador, posAtualJogador;
+		if(jogadores.indexOf(jogadorDealer) == jogadores.size() - 1)
+			posPrimeiroJogador = 0;
+		else
+			posPrimeiroJogador = jogadores.indexOf(jogadorDealer) + 1;
+		posAtualJogador = posPrimeiroJogador;
+		
+		int i = 0;
+		Jogador j;
+		while(i < jogadores.size()) {
+			j = jogadores.get(posAtualJogador);
+			
 			if(j.isBot()) {
 				if(j.getPontuacao() >= 5)                                               // Mantém a mão inicial caso tenha, pelo menos, um STRAIGHT.
 					System.out.println(j.getNome()+" manteve sua mão inicial.");
@@ -228,7 +242,7 @@ public class Controle {
 						trocaCartasIndividual(j);
 				}
 				
-			}else {
+			} else {
 				System.out.println();
 				j.setPontuacao(achaCombinacao(j.getMao()));
 				j.imprimeMao();
@@ -239,10 +253,16 @@ public class Controle {
 					op = Teclado.leString("Digite uma opção válida. (S/N)");
 				
 				if(op.equalsIgnoreCase("N"))
-					System.out.println("Nenhuma carta será trocada.");
+					System.out.println(j.getNome()+" manteve sua mão inicial.\n");
 				else
 					trocaCartasIndividual(j);
 			}
+			
+			if(posAtualJogador < jogadores.size() - 1)
+				posAtualJogador++;
+			else
+				posAtualJogador = 0;
+			i++;
 		}
 	}
 	
@@ -290,7 +310,7 @@ public class Controle {
 					
 					try
 					{
-						numCarta = Integer.parseInt(arrStr[i]) - 1;
+						numCarta = Integer.parseInt(arrStr[i]);
 					}
 					catch (NumberFormatException e)
 					{
@@ -298,13 +318,11 @@ public class Controle {
 						break;
 					}
 					
-					if(numCarta >= 1 && numCarta <= 5) {
-						opCartas[i] = numCarta;
-						//continue;
-					} else {
+					if(numCarta < 1 || numCarta > 5) {
 						System.out.println("Entrada inválida: digite os números no formato indicado.");
 						break;
 					}
+					opCartas[i] = numCarta - 1;
 				}
 				if(opCartas[opCartas.length - 1] != 0)
 					break;
@@ -386,20 +404,19 @@ public class Controle {
 		int op = 0;
 		while(true) {
 			if(atualJogador.isBot()) {
-				if(atualJogador.isJogandoRodada()) {
-					if((int)(Math.random() * 10 + 1) > 5) {            // 50% de chance de ser uma jogada aleatória.
+				if((int)(Math.random() * 10 + 1) > 5) {            // 50% de chance de ser uma jogada aleatória.
+					if(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck(apostaAumentou))
 						op = (int)(Math.random() * 4 + 1);
-						while(op == 4 && posJogador != jogadores.indexOf(jogadorBB))
-							op = (int)(Math.random() * 4 + 1);
-					} else
-						if(atualJogador.getPontuacao() >= 5)           // Aumenta a aposta se o bot tiver, pelo menos, um STRAIGHT.
-							op = 2;
-						else if(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck(apostaAumentou))
-							op = 4;
-						else
-							op = 1;
+					else
+						op = (int)(Math.random() * 3 + 1);
+
 				} else
-					break;
+					if(atualJogador.getPontuacao() >= 5)           // Aumenta a aposta se o bot tiver, pelo menos, um STRAIGHT.
+						op = 2;
+					else if(posJogador == jogadores.indexOf(jogadorBB) && podeDarCheck(apostaAumentou))
+						op = 4;
+					else
+						op = 1;
 				
 			} else {
 				op = Teclado.leInt("Digite sua jogada: ");
@@ -436,7 +453,7 @@ public class Controle {
 				if(atualJogador.isBot()) {
 					if(atualJogador.getPontuacao() >= 8 || atualJogador.getFichas() == maiorAposta)
 						apostaJogador = atualJogador.getFichas();
-					else if((int)(Math.random() * 100 + 1) <= 5)
+					else if((int)(Math.random() * 100) < 5)
 						apostaJogador = atualJogador.getFichas();
 					else {
 						while(apostaJogador == 0 || apostaJogador > atualJogador.getFichas() ||  apostaJogador % 5 != 0) {
@@ -491,8 +508,6 @@ public class Controle {
 			apostasRodada[posJogador] = apostaJogador;
 			return (op == 2 ? true : false);
 		}
-		
-		return false;
 	}
 	
 	/**
