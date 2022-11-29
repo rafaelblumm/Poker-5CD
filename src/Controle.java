@@ -120,7 +120,7 @@ public class Controle {
 	
 	/**
 	 * Método que pausa o programa em ms milissegundos.
-	 * @param (int) Valor da pausa em ms.
+	 * @param ms (int) Valor da pausa em ms.
 	 */
 	public void pausa(int ms) {
 		try{
@@ -419,7 +419,7 @@ public class Controle {
 	 * Método que troca as cartas de cada jogador de acordo com sua escolha.
 	 * Cartas de BOTs a serem trocadas são escolhidas aleatoriamente, tanto a quantidade de cartas
 	 * quanto as cartas da mão que serão trocadas.
-	 * @param (Jogador) atual jogador da rodada de troca de cartas.
+	 * @param jogador (Jogador) Atual jogador da rodada de troca de cartas.
 	 */
 	public void trocaCartasIndividual(Jogador jogador) {
 		if(jogador.isBot()) {
@@ -539,9 +539,9 @@ public class Controle {
 	/**
 	 * Método que realiza as apostas individuais dos jogadores dentro da rodada de apostas.
 	 * Jogadores computador (BOT) têm 50% de chance de realizar uma jogada aleatória.
-	 * @param (int) posição do atual jogador.
-	 * @param (boolean) recebe se houve aumento de aposta na rodada.
-	 * @return (boolean) indica se algum jogador aumentou a aposta.
+	 * @param posJogador (int) Posição do atual jogador.
+	 * @param apostaAumentou (boolean) Recebe se houve aumento de aposta na rodada.
+	 * @return (boolean) 'true' se algum jogador aumentou a aposta; 'false', caso contrário.
 	 */
 	public boolean apostaIndividual(int posJogador, boolean apostaAumentou) {
 		Jogador atualJogador = jogadores.get(posJogador);
@@ -691,7 +691,7 @@ public class Controle {
 	
 	/**
 	 * Método que checa se todas as apostas da rodada são CALL ou FOLD, e não RAISE.
-	 * @return (boolean) indica se apostas são iguais.
+	 * @return (boolean) Indica 'true' se apostas são iguais; 'false', caso contrário.
 	 */
 	public boolean todasApostasIguais() {
 		for(int i = 1; i < apostasRodada.length; i++)
@@ -702,8 +702,8 @@ public class Controle {
 	
 	/**
 	 * Método que avalia as jogadas da rodada a procura de aumentos na aposta (RAISE) ou desistências (FOLD).
-	 * @param (boolean) recebe se algum jogador escolheu aumentar a aposta, incluindo o primeiro jogador da rodada.
-	 * @return (boolean) indica se o jogador na posição BIG BLIND pode escolher dar CHECK na rodada.
+	 * @param apostaAumentou (boolean) Recebe se algum jogador escolheu aumentar a aposta, incluindo o primeiro jogador da rodada.
+	 * @return (boolean) Indica 'true' se o jogador na posição BIG BLIND pode escolher dar CHECK na rodada; 'false', caso contrário.
 	 */
 	public boolean podeDarCheck(boolean apostaAumentou) {
 		if(apostaAumentou)
@@ -718,7 +718,7 @@ public class Controle {
 	
 	/**
 	 * Método que realiza a contagem de jogadores que não desistiram da rodada (FOLD).
-	 * @return (int) jogadores jogando rodada.
+	 * @return (int) Jogadores que estão jogando a atual rodada.
 	 */
 	public int contaJogadoresRodada() {
 		int totalJogadores = 0;
@@ -730,8 +730,8 @@ public class Controle {
 	
 	/**
 	 * Método que procura todas as combinações de cartas possíveis.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (int) pontuação da combinação, sendo 10 a maior (ROYAL-FLUSH) e 1 a menor (HIGH-CARD).
+	 * @param mao (Carta[]) Mão do atual jogador da rodada.
+	 * @return (int) Pontuação da combinação. MAX = 10 (ROYAL-FLUSH); MIN = 1 (HIGH-CARD).
 	 */
 	public int achaCombinacao(Carta[] mao) {
 		if(royalFlush(mao))
@@ -758,8 +758,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma sequência de ROYAL-FLUSH.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean royalFlush(Carta[] mao) {
 		if(mao[0].getValor() == 10 && flush(mao) && straight(mao))
@@ -770,8 +770,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma sequência de STRAIGHT-FLUSH.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean straightFlush(Carta[] mao) {
 		if(straight(mao) && flush(mao))
@@ -782,8 +782,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de QUADRA..
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean quadra(Carta[] mao) {
 		for(int i = 0; i < 2; i++)
@@ -799,8 +799,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de FULL-HOUSE.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean fullHouse(Carta[] mao) {
 		if(mao[0].getValor() == mao[1].getValor() && mao[3].getValor() == mao[4].getValor())
@@ -811,8 +811,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de FLUSH.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean flush(Carta[] mao) {
 		for(int i = 1; i < mao.length; i++)
@@ -824,8 +824,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma sequência de STRAIGHT.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean straight(Carta[] mao) {
 		if(!(mao[mao.length - 1].getValor() == 14 &&
@@ -842,8 +842,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de TRINCA.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean trinca(Carta[] mao) {
 		for(int i = 2; i < mao.length; i++)
@@ -855,8 +855,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de DOIS PARES.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean doisPares(Carta[] mao) {
 		for(int i = 1; i < mao.length; i++)
@@ -870,8 +870,8 @@ public class Controle {
 	
 	/**
 	 * Procura uma combinação de UM PAR.
-	 * @param (Carta[]) recebe mão do atual jogador da rodada.
-	 * @return (boolean) indica se a combinação existe.
+	 * @param mao (Carta[]) Recebe mão do atual jogador da rodada.
+	 * @return (boolean) Indica se a combinação existe.
 	 */
 	public boolean umPar(Carta[] mao) {
 		for(int i = 1; i < mao.length; i++)
@@ -937,8 +937,8 @@ public class Controle {
 	
 	/**
 	 * Método que checa a pontuação dos jogadores restantes da rodada a procura de um empate.
-	 * @param (Jogador[]) recebe Array com os jogadores que não desistiram da rodada (FOLD).
-	 * @return (boolean) indica se houve empate.
+	 * @param jRestantes (Jogador[]) Recebe Array com os jogadores que não desistiram da rodada (FOLD).
+	 * @return (boolean) Indica se houve empate.
 	 */
 	public boolean checaEmpate(Jogador[] jRestantes) {
 		if(jRestantes.length > 1)
@@ -949,9 +949,9 @@ public class Controle {
 	
 	/**
 	 * Método que realiza a contagem dos jogadores restantes com pontuações iguais na rodada.
-	 * @param (Jogador[]) recebe Array com os jogadores que não desistiram da rodada (FOLD).
-	 * @param (int) recebe maior pontuação obtida pelos jogadores restantes da rodada.
-	 * @return (int) indica número de jogadores que empataram.
+	 * @param jRestantes (Jogador[]) Recebe Array com os jogadores que não desistiram da rodada (FOLD).
+	 * @param maiorPontuacao (int) Recebe maior pontuação obtida pelos jogadores restantes da rodada.
+	 * @return (int) Indica número de jogadores que empataram.
 	 */
 	public int contaJogadoresEmpate(Jogador[] jRestantes, int maiorPontuacao) {
 		int total = 0;
@@ -964,9 +964,9 @@ public class Controle {
 	
 	/**
 	 * Método que troca a função dos jogadores na mesa (DEALER, SMALL BLIND, BIG BLIND).
-	 * @param (int) posição atual do DEALER.
-	 * @param (int) posição atual do SMALL BLIND.
-	 * @param (int) posição atual do BIG BLIND.
+	 * @param posDealer (int) Posição atual do DEALER.
+	 * @param posSB (int) Posição atual do SMALL BLIND.
+	 * @param posBB (int) Posição atual do BIG BLIND.
 	 */
 	public void rotacionaOrdemJogadores(int posDealer, int posSB, int posBB) {
 		if(jogadores.contains(jogadorDealer))
@@ -990,7 +990,7 @@ public class Controle {
 	
 	/**
 	 * Método que procura jogadores com 0 fichas.
-	 * @return (boolean) indica se há algum perdedor.
+	 * @return (boolean) Indica se há algum perdedor.
 	 */
 	public boolean checaPerdedores() {
 		for(Jogador j: jogadores)
@@ -1001,7 +1001,7 @@ public class Controle {
 	
 	/**
 	 * Método que realiza a contagem dos jogadores com 0 fichas.
-	 * @return (int) número de jogadores com 0 fichas.
+	 * @return (int) Número de jogadores com 0 fichas.
 	 */
 	public int contaPerdedores() {
 		int quantPerdedores = 0;
@@ -1014,8 +1014,8 @@ public class Controle {
 	
 	/**
 	 * Método que indica quais jogadores não têm mais fichas.
-	 * @param (int) recebe a quantidade de jogadores com 0 fichas.
-	 * @return (Jogador[]) indica Array de jogadores com 0 fichas.
+	 * @param quantPerdedores (int) Recebe a quantidade de jogadores com 0 fichas.
+	 * @return (Jogador[]) Indica Array de jogadores com 0 fichas.
 	 */
 	public Jogador[] encontraPerdedores(int quantPerdedores) {
 		Jogador[] arrayPerdedores = new Jogador[quantPerdedores];
@@ -1032,7 +1032,7 @@ public class Controle {
 	
 	/**
 	 * Método que remove todos jogadores com 0 fichas e imprime mensagem indicando quem são os jogadores perdedores.
-	 * @param (Jogador[]) recebe Array que aponta para jogadores com 0 fichas.
+	 * @param perdedores (Jogador[]) Recebe Array que aponta para jogadores com 0 fichas.
 	 */
 	public void removePerdedores(Jogador[] perdedores) {
 		String msg = "\n> ";
@@ -1051,7 +1051,7 @@ public class Controle {
 	
 	/**
 	 * Método que indica se todos os jogadores da mesa são bots.
-	 * @return (boolean) indica se todos jogadores são BOTS.
+	 * @return (boolean) Indica se todos jogadores são BOTS.
 	 */
 	public boolean checaSeTodosBots() {
 		for(Jogador j: jogadores)
