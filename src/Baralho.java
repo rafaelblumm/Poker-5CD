@@ -43,7 +43,7 @@ public class Baralho {
 	
 	/**
 	 * Método que remove e retorna a carta do topo do baralho.
-	 * @return (Carta) carta do topo do baralho.
+	 * @return (Carta) Carta do topo do baralho.
 	 */
 	public Carta distribuiCarta() {
 		Carta holdCarta;
@@ -60,7 +60,7 @@ public class Baralho {
 	
 	/**
 	 * Método que recebe um objeto Carta por parâmetro e a insere no Array de Carta.
-	 * @param (Carta) carta a ser inserida no Array de Carta.
+	 * @param c (Carta) Carta a ser inserida no Array de Carta.
 	 */
 	public void adicionaCarta(Carta c) {
 		for(int i = 0; i < cartas.length; i++)
@@ -72,7 +72,7 @@ public class Baralho {
 	
 	/**
 	 * Método que conta quantos objetos de Carta existem no Array de Carta.
-	 * @return (int) quantidade de cartas no baralho.
+	 * @return (int) Quantidade de cartas no baralho.
 	 */
 	public int quantCartas() {
 		int total = 0;
