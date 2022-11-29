@@ -40,12 +40,17 @@ public class Carta implements Comparable<Carta>{
 	}
 	
 	@Override
-	public int compareTo(Carta o) {
-		return this.valor - o.getValor();
+	public int compareTo(Carta c) {
+		return valor - c.getValor();
 	}
 	
+	/**
+	 * Método que informa o valor e naipe da carta com a formatação VVN (Valor/Naipe).
+	 * @return (String) VVN (Valor/Naipe).
+	 */
 	public String cartaSimbolo() {
 		String str;
+		
 		if(valor >= 2 && valor <= 10)
 			str = ""+valor;
 		else if(valor == 11)
