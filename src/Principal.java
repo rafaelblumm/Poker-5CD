@@ -69,10 +69,9 @@ public class Principal {
 					op = Teclado.leInt("Digite sua escolha: ");
 					while(op < 1 || op > 2)
 						op = Teclado.leInt("Digite uma opção válida: ");
-					if(op == 1) {
-						ctrl.sorteiaVencedor();
+					if(op == 1)
 						System.out.println("\n> Você fez um bom jogo!");
-					} else {
+					else {
 						continuarNaMesa = true;
 						System.out.println("\n> Relaxe e acompanhe o jogo!");
 					}
