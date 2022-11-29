@@ -183,7 +183,8 @@ public class Controle {
 				+ "7        Full House        Trinca + Par.\r\n"
 				+ "8        Quadra            4 cartas iguais.\r\n"
 				+ "9        Straight Flush    Straight (qualquer) + Flush.\r\n"
-				+ "10       Royal Flush       Straight (10-J-Q-K-A) + Flush.\r\n");
+				+ "10       Royal Flush       Straight (10-J-Q-K-A) + Flush.\r\n\n"
+				+ "*********************************************\n");
 	}
 	
 	/**
@@ -233,20 +234,20 @@ public class Controle {
 					(jogadores.contains(arrayJogadores[2]) ? " "+arrayJogadores[2].getNome() : "")+"\n";
 		
 		l4 = "  "+(!jogadores.contains(arrayJogadores[1]) ? "       " : "$"+arrayJogadores[1].getFichas()+
-				(arrayJogadores[1].getFichas() < 1000 ? "   " : arrayJogadores[1].getFichas() < 100 ? "     " : "      "))+
+				(arrayJogadores[1].getFichas() < 1000 ? "   " : arrayJogadores[1].getFichas() < 100 ? "    " : "     "))+
 				" |                     |"+(jogadores.contains(arrayJogadores[2]) ? " $"+arrayJogadores[2].getFichas() : "")+"\n";
 		
 		l5 = "          |                     | \n";
 		
 		l6 = "  "+(jogadores.contains(arrayJogadores[0]) ? arrayJogadores[0].getNome() : "       ")+" |  "+
 				(jogadorDealer.equals(arrayJogadores[0]) ? "D " : (jogadorSB.equals(arrayJogadores[0]) ? "SB" :
-				(jogadorSB.equals(arrayJogadores[0]) ? "SB" : "  ")))+"             "+
+				(jogadorBB.equals(arrayJogadores[0]) ? "BB" : "  ")))+"             "+
 				(jogadorDealer.equals(arrayJogadores[3]) ? "D " : (jogadorSB.equals(arrayJogadores[3]) ? "SB" :
 				(jogadorBB.equals(arrayJogadores[3]) ? "BB" : "  ")))+"  |"+
 				(jogadores.contains(arrayJogadores[3]) ? " "+arrayJogadores[3].getNome() : "")+"\n";
 		
 		l7 = "  "+(!jogadores.contains(arrayJogadores[0]) ? "       " : "$"+arrayJogadores[0].getFichas()+
-				(arrayJogadores[0].getFichas() < 1000 ? "   " : arrayJogadores[0].getFichas() < 100 ? "     " : "      "))+
+				(arrayJogadores[0].getFichas() < 1000 ? "   " : arrayJogadores[0].getFichas() < 100 ? "    " : "     "))+
 				" |          "+(jogadorDealer.equals(arrayJogadores[4]) ? "D " : (jogadorSB.equals(arrayJogadores[4]) ? "SB" :
 				(jogadorBB.equals(arrayJogadores[4]) ? "BB" : "  ")))+"         |"+
 				(jogadores.contains(arrayJogadores[3]) ? " $"+arrayJogadores[3].getFichas() : "")+"\n";
@@ -278,12 +279,21 @@ public class Controle {
 			jogadores.get(i).setPontuacao(0);
 		}
 		
-		System.out.println("\n############### RODADA Nº "+rodada+" ###############");
+		System.out.println();
+		String str = "################ RODADA Nº "+rodada+" ################";
+		for(int i = 0; i < 3; i++)
+			if(i == 1)
+				System.out.println("\n"+str);
+			else
+			for(int j = 0; j < str.length(); j++)
+				System.out.print("#");
+		
+		System.out.println();
 		imprimeMesa();
 		resetBaralho();
 		System.out.print("\n> Embaralhando");
-		for(int i = 0; i < 5; i++) {
-			pausa(500);
+		for(int i = 0; i < 7; i++) {
+			pausa(300);
 			System.out.print(".");
 			baralho.embaralha();
 		}
@@ -316,14 +326,13 @@ public class Controle {
 	 * Método que gerencia a etapa de DISTRIBUIÇÃO DE CARTAS.
 	 */
 	public void distribuiMaos() {
-		for(int i = 0; i < 5; i++) {
-			for(Jogador j: jogadores) {
+		for(int i = 0; i < 5; i++)
+			for(Jogador j: jogadores) 
 				j.recebeCarta(baralho.distribuiCarta(), i);
-				if(i == 4) {
-					Arrays.sort(j.getMao());
-					j.setPontuacao(achaCombinacao(j.getMao()));
-				}
-			}
+		
+		for(Jogador j: jogadores) {
+			Arrays.sort(j.getMao());
+			j.setPontuacao(achaCombinacao(j.getMao()));
 		}
 	}
 	
@@ -507,20 +516,21 @@ public class Controle {
 			posPrimeiroJogador = jogadores.indexOf(jogadorBB) + 1;
 		int posAtualJogador = posPrimeiroJogador;
 		
-		boolean apostaAumentou = false;;
-		while(true) {
-			for(int i = 0; i < jogadores.size(); i++) 
-				if(jogadores.get(posAtualJogador).isJogandoRodada()) {
-					if(apostaIndividual(posAtualJogador, apostaAumentou)) {
+		boolean apostaAumentou = false;
+		outer: while(true) {
+			for(int i = 0; i < jogadores.size(); i++) {
+				if(jogadores.get(posAtualJogador).isJogandoRodada())
+					if(contaJogadoresRodada() == 1)
+						break outer;
+					else if(apostaIndividual(posAtualJogador, apostaAumentou)) {
 						i = 0;
 						apostaAumentou = true;
 					}
-					
-					posAtualJogador++;
-					if(posAtualJogador == jogadores.size())
-						posAtualJogador = 0;
-				}
-			
+				
+				posAtualJogador++;
+				if(posAtualJogador == jogadores.size())
+					posAtualJogador = 0;
+			}
 			if((todasApostasIguais() && contaJogadoresRodada() > 1) || contaJogadoresRodada() == 1)
 				break;
 		}
@@ -595,7 +605,8 @@ public class Controle {
 						System.out.println("> "+atualJogador.getNome()+" igualou a aposta de $"+maiorAposta+".");
 					}
 				} else {
-					System.out.println("JOGADA ILEGAL: você não tem fichas suficientes para dar CALL.");
+					if(!atualJogador.isBot())
+						System.out.println("JOGADA ILEGAL: você não tem fichas suficientes para dar CALL.");
 					continue;
 				}
 			
@@ -672,7 +683,7 @@ public class Controle {
 			
 			System.out.println("\nPote: $"+pote+"\nFichas: $"+atualJogador.getFichas());
 			System.out.println("\n*********************************************");
-			pausa(1000);
+			pausa(875);
 			apostasRodada[posJogador] = apostaJogador;
 			return (op == 2 ? true : false);
 		}
@@ -904,13 +915,13 @@ public class Controle {
 			}
 			
 			msgEmpate += " empataram com "+jogadoresEmpate[0].nomeCombinacao()+"."
-					+ "\nCada um ganhou $"+(pote / jogadoresEmpate.length+" do total de $"+pote+" fichas!");
+					+ "\n> Cada um ganhou $"+(pote / jogadoresEmpate.length+" do total de $"+pote+" fichas!");
 			System.out.println(msgEmpate);
 			
 		} else {
 			Jogador vencedor = jogadoresRestantes[jogadoresRestantes.length - 1];
 			vencedor.setFichas(vencedor.getFichas() + pote);
-			System.out.println(vencedor.getNome()+" venceu a rodada com "+vencedor.nomeCombinacao()+" e ganhou $"+pote+" fichas!");
+			System.out.println("> "+vencedor.getNome()+" venceu a rodada com "+vencedor.nomeCombinacao()+" e ganhou $"+pote+" fichas!");
 		}
 		
 		int posDealer = jogadores.indexOf(jogadorDealer);
@@ -1001,7 +1012,6 @@ public class Controle {
 		return quantPerdedores;
 	}
 	
-	
 	/**
 	 * Método que indica quais jogadores não têm mais fichas.
 	 * @param (int) recebe a quantidade de jogadores com 0 fichas.
@@ -1020,13 +1030,12 @@ public class Controle {
 		return arrayPerdedores;
 	}
 	
-	
 	/**
 	 * Método que remove todos jogadores com 0 fichas e imprime mensagem indicando quem são os jogadores perdedores.
 	 * @param (Jogador[]) recebe Array que aponta para jogadores com 0 fichas.
 	 */
 	public void removePerdedores(Jogador[] perdedores) {
-		String msg = "> ";
+		String msg = "\n> ";
 		for(int i = 0; i < perdedores.length; i++) {
 			if(jogadores.contains(perdedores[i])) {
 				jogadores.remove(perdedores[i]);
@@ -1040,7 +1049,6 @@ public class Controle {
 		System.out.println(msg);
 	}
 	
-	
 	/**
 	 * Método que indica se todos os jogadores da mesa são bots.
 	 * @return (boolean) indica se todos jogadores são BOTS.
@@ -1050,5 +1058,15 @@ public class Controle {
 			if(!j.isBot())
 				return false;
 		return true;
+	}
+	
+	/**
+	 * Método que sorteia um jogador para ser o vencedor.
+	 */
+	public void sorteiaVencedor() {
+		int rand = (int)(Math.random() * jogadores.size());
+		Jogador vencedor = jogadores.get(rand);
+		jogadores.clear();
+		jogadores.add(vencedor);
 	}
 }
