@@ -1059,14 +1059,4 @@ public class Controle {
 				return false;
 		return true;
 	}
-	
-	/**
-	 * Método que sorteia um jogador para ser o vencedor.
-	 */
-	public void sorteiaVencedor() {
-		int rand = (int)(Math.random() * jogadores.size());
-		Jogador vencedor = jogadores.get(rand);
-		jogadores.clear();
-		jogadores.add(vencedor);
-	}
 }
