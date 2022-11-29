@@ -73,11 +73,17 @@ public class Jogador implements Comparable<Jogador>{
 		return pontuacao - j.getPontuacao();
 	}
 	
+	/**
+	 * Método que imprime as cartas contidas na mão do jogador com a formatação 'VVN - VVN - VVN - VVN - VVN' (Valor/Naipe).
+	 */
 	public void imprimeMao() {
 		for(int i = 0; i < mao.length; i++)
 			System.out.print(mao[i].cartaSimbolo() + (i == mao.length-1 ? "\n" : " - "));
 	}
 	
+	/**
+	 * Método que imprime o nome da combinação de cartas correspondente a pontuação da mão do jogador junto a uma frase.
+	 */
 	public void imprimeCombinacao() {
 		if(pontuacao == 10)
 			System.out.println("Você tem um ROYAL-FLUSH.");
@@ -101,6 +107,10 @@ public class Jogador implements Comparable<Jogador>{
 			System.out.println("Você tem uma HIGH CARD: "+mao[mao.length - 1].toString()+".");
 	}
 	
+	/**
+	 * Método que imprime o nome da combinação de cartas correspondente a pontuação da mão do jogador.
+	 * @return (String) Nome da combinação de cartas.
+	 */
 	public String nomeCombinacao() {
 		if(pontuacao == 10)
 			return "ROYAL-FLUSH";
@@ -124,6 +134,11 @@ public class Jogador implements Comparable<Jogador>{
 			return "HIGH CARD";
 	}
 	
+	/**
+	 * Método que insere um objeto de Carta na mão do jogador de acordo com a posição informada.
+	 * @param c (Carta) Carta a ser adicionada na mão do jogador.
+	 * @param pos (int) Posição do Array mao a ser inserida a carta.
+	 */
 	public void recebeCarta(Carta c, int pos) {
 		mao[pos] = c;
 	}
