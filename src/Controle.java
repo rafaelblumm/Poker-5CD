@@ -706,7 +706,7 @@ public class Controle {
 	 * @return (boolean) Indica 'true' se o jogador na posição BIG BLIND pode escolher dar CHECK na rodada; 'false', caso contrário.
 	 */
 	public boolean podeDarCheck(boolean apostaAumentou) {
-		if(apostaAumentou)
+		if(apostaAumentou || contaJogadoresRodada() < jogadores.size())
 			return false;
 		else {
 			for(int aposta: apostasRodada)
