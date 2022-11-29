@@ -18,18 +18,16 @@ public class Principal {
 		+ "                       1. NOVO JOGO\n"
 		+ "                       2. REGRAS");
 		
+		Controle ctrl = new Controle();
+		boolean continuarNaMesa = false;
+		
 		int op = Teclado.leInt("\nDigite a opção desejada: ");
 		while(op < 1 || op > 2)
 			op = Teclado.leInt("Digite uma opção válida: ");
-		
 		if(op == 2)
-			System.out.println("\nRegras");;
-			
-			
-		Controle ctrl = new Controle();
-		ctrl.adicionaJogadores();
-			
+			ctrl.imprimeRegras();
 		
+		ctrl.adicionaJogadores();
 		while(ctrl.getJogadores().size() > 1) {
 			ctrl.novaRodada();
 			
@@ -38,16 +36,19 @@ public class Principal {
 			System.out.println("\nDISTRIBUIÇÃO DAS CARTAS");
 			ctrl.distribuiMaos();
 			System.out.println(ctrl.getJogadorDealer().getNome()+" está na posição do DEALER.");
+			ctrl.pausa(1000);
 			
 			
 			// ETAPA 2: APOSTAS INICIAIS
 			System.out.println("\nAPOSTAS INICIAIS");
 			ctrl.apostasIniciais();
+			ctrl.pausa(1000);
 			
 			
 			// ETAPA 3: TROCA DE CARTAS
 			System.out.println("\nTROCA DE CARTAS");
 			ctrl.rodadaTrocaCartas();
+			System.out.println("\n*********************************************");
 			
 			
 			// ETAPA 4: APOSTAS
@@ -58,23 +59,22 @@ public class Principal {
 			
 			// ETAPA 5: RESULTADO
 			ctrl.rodadaResultado();
+			ctrl.pausa(1000);
 			
-			if(ctrl.checaSeTodosBots()) {
-				System.out.println("Você perdeu a partida e só restaram jogadores BOT.\n"
-									+ "\n     1. Sair da mesa."
+			if(ctrl.getJogadores().size() > 1 && ctrl.checaSeTodosBots() && !continuarNaMesa) {
+				System.out.println("\nVocê perdeu a partida e só restaram jogadores BOT.\n"
+									+ "     1. Sair da mesa."
 									+ "\n     2. Ficar na mesa e acompanhar a partida.\n");
-				
 				op = Teclado.leInt("Digite sua escolha: ");
 				while(op < 1 || op > 2)
 					op = Teclado.leInt("Digite uma opção válida: ");
-				
 				if(op == 1)
 					System.out.println("\n> Você fez um bom jogo!");
-				else
+				else {
+					continuarNaMesa = true;
 					System.out.println("\n> Relaxe e acompanhe o jogo!");
+				}
 			}
-			
-		
 		}
 		
 		System.out.println("***********************************************\n\n"+
