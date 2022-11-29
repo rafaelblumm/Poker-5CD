@@ -247,7 +247,7 @@ public class Controle {
 				(jogadores.contains(arrayJogadores[3]) ? " "+arrayJogadores[3].getNome() : "")+"\n";
 		
 		l7 = "  "+(!jogadores.contains(arrayJogadores[0]) ? "       " : "$"+arrayJogadores[0].getFichas()+
-				(arrayJogadores[0].getFichas() < 10 ? "    " : arrayJogadores[0].getFichas() < 100 ? "    " : "   "))+
+				(arrayJogadores[0].getFichas() < 10 ? "     " : arrayJogadores[0].getFichas() < 100 ? "    " : "   "))+
 				" |          "+(jogadorDealer.equals(arrayJogadores[4]) ? "D " : (jogadorSB.equals(arrayJogadores[4]) ? "SB" :
 				(jogadorBB.equals(arrayJogadores[4]) ? "BB" : "  ")))+"         |"+
 				(jogadores.contains(arrayJogadores[3]) ? " $"+arrayJogadores[3].getFichas() : "")+"\n";
