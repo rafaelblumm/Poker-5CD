@@ -234,7 +234,7 @@ public class Controle {
 					(jogadores.contains(arrayJogadores[2]) ? " "+arrayJogadores[2].getNome() : "")+"\n";
 		
 		l4 = "  "+(!jogadores.contains(arrayJogadores[1]) ? "       " : "$"+arrayJogadores[1].getFichas()+
-				(arrayJogadores[1].getFichas() < 1000 ? "   " : arrayJogadores[1].getFichas() < 100 ? "    " : "     "))+
+				(arrayJogadores[1].getFichas() < 10 ? "     " : arrayJogadores[1].getFichas() < 100 ? "    " : "   "))+
 				" |                     |"+(jogadores.contains(arrayJogadores[2]) ? " $"+arrayJogadores[2].getFichas() : "")+"\n";
 		
 		l5 = "          |                     | \n";
@@ -247,7 +247,7 @@ public class Controle {
 				(jogadores.contains(arrayJogadores[3]) ? " "+arrayJogadores[3].getNome() : "")+"\n";
 		
 		l7 = "  "+(!jogadores.contains(arrayJogadores[0]) ? "       " : "$"+arrayJogadores[0].getFichas()+
-				(arrayJogadores[0].getFichas() < 1000 ? "   " : arrayJogadores[0].getFichas() < 100 ? "    " : "     "))+
+				(arrayJogadores[0].getFichas() < 10 ? "    " : arrayJogadores[0].getFichas() < 100 ? "    " : "   "))+
 				" |          "+(jogadorDealer.equals(arrayJogadores[4]) ? "D " : (jogadorSB.equals(arrayJogadores[4]) ? "SB" :
 				(jogadorBB.equals(arrayJogadores[4]) ? "BB" : "  ")))+"         |"+
 				(jogadores.contains(arrayJogadores[3]) ? " $"+arrayJogadores[3].getFichas() : "")+"\n";
@@ -261,7 +261,7 @@ public class Controle {
 			l9 += arrayJogadores[4].getNome() + "\n";
 		}
 		
-		l10 = (jogadores.contains(arrayJogadores[4]) ? "                  $"+arrayJogadores[4].getFichas() : "");
+		l10 = (jogadores.contains(arrayJogadores[4]) ? "                   $"+arrayJogadores[4].getFichas() : "");
 
 		System.out.println(l1 + l2 + l3 + l4 + l5 + l6 + l7 + l8 + l9 + l10);
 	}
