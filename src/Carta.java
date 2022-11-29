@@ -46,7 +46,7 @@ public class Carta implements Comparable<Carta>{
 	
 	/**
 	 * Método que informa o valor e naipe da carta com a formatação VVN (Valor/Naipe).
-	 * @return (String) VVN (Valor/Naipe).
+	 * @return (String) Valor da carta no formato VVN (Valor/Naipe).
 	 */
 	public String cartaSimbolo() {
 		String str;
