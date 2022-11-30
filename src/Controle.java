@@ -130,9 +130,51 @@ public class Controle {
 	}
 	
 	/**
+	 * Método que gerencia o menu inicial.
+	 * @return (boolean) Indica 'true' caso o jogador escolha iniciar o jogo; 'false', caso escolha sair. 
+	 */
+	public static boolean menuInicial() {
+		imprimeTitulo();
+		int op = Teclado.leInt("\nDigite a opção desejada: ");
+		while(op < 1 || op > 3)
+			op = Teclado.leInt("Digite uma opção válida: (1, 2, ou 3");
+		
+		if(op == 1) {
+			System.out.println("\n> Seja bem-vindo!\n> Iniciando novo jogo.");
+			return true;
+		} else if(op == 2) {
+			if(!Controle.imprimeRegras())
+				return false;
+			return true;
+		} else
+			return false;
+	}
+	
+	/**
+	 * Método que imprime o título do jogo em ASCII ART.
+	 */
+	public static void imprimeTitulo() {
+		System.out.println(
+				"                 _____      _\r\n"
+				+ "                |  __ \\    | |\r\n"
+				+ "                | |__) ___ | | _____ _ __\r\n"
+				+ "                |  ___/ _ \\| |/ / _ | '__|\r\n"
+				+ "                | |  | (_) |   |  __| |\r\n"
+				+ "  _____         |_|   \\___/| |\\_\\___|_|\r\n"
+				+ " | ____|                   | |     | |\r\n"
+				+ " | |__     ___ __ _ _ __ __| |   __| |_ __ __ ___      __\r\n"
+				+ " |___ \\   / __/ _` | '__/ _` |  / _` | '__/ _` \\ \\ /\\ / /\r\n"
+				+ "  ___) | | (_| (_| | | | (_| | | (_| | | | (_| |\\ V  V / \r\n"
+				+ " |____/   \\___\\__,_|_|  \\__,_|  \\__,_|_|  \\__,_| \\_/\\_/\r\n\n"
+				+ "                       1. NOVO JOGO\n"
+				+ "                       2. REGRAS\n"
+				+ "                       3. SAIR");
+	}
+	
+	/**
 	 * Método que imprime as regras do jogo.
 	 */
-	public void imprimeRegras() {
+	public static boolean imprimeRegras() {
 		System.out.println("\n> POSIÇÕES NA MESA\r\n"
 				+ "O jogador ao lado do DEALER é chamado de SMALL BLIND,\r\n"
 				+ "e o jogador ao lado do SMALL BLIND é chamado de BIG BLIND.\r\n"
@@ -184,7 +226,15 @@ public class Controle {
 				+ "8        Quadra            4 cartas iguais.\r\n"
 				+ "9        Straight Flush    Straight (qualquer) + Flush.\r\n"
 				+ "10       Royal Flush       Straight (10-J-Q-K-A) + Flush.\r\n\n"
-				+ "*********************************************\n");
+				+ "*********************************************\n\n"
+				+ "     1. INICIAR O JOGO\n"
+				+ "     2. SAIR");
+		int op = Teclado.leInt("\nDigite a opção desejada: ");
+		while(op < 1 || op > 2)
+			op = Teclado.leInt("Digite uma opção válida: (1 ou 2)");
+		if(op == 1)
+			return true;
+		return false;
 	}
 	
 	/**
