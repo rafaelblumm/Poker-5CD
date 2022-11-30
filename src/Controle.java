@@ -232,9 +232,10 @@ public class Controle {
 		int op = Teclado.leInt("\nDigite a opção desejada: ");
 		while(op < 1 || op > 2)
 			op = Teclado.leInt("Digite uma opção válida: (1 ou 2)");
-		if(op == 1)
-			return true;
-		return false;
+		if(op == 2)
+			return false;
+		System.out.println("\n> Seja bem-vindo!\n> Iniciando novo jogo.");
+		return true;
 	}
 	
 	/**
